@@ -2,7 +2,7 @@
 ###
  # @Author: your name
  # @Date: 2021-12-05 20:27:42
- # @LastEditTime: 2021-12-05 21:02:41
+ # @LastEditTime: 2021-12-05 21:52:07
  # @LastEditors: Please set LastEditors
  # @Description: 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  # @FilePath: /xml-py-tool/download/sh_download_gnssfile.sh
@@ -53,6 +53,7 @@ while($count)
   set ymd_day = `echo $date | cut -b 3-4`
   set WEEKD  = `$bindir/mjday $doy $yyyy | awk '{nwk=int(($1-44244)/7);nwkd=$1-44244-nwk*7;print nwk*10+nwkd}'`
   set WEEK   = `echo $WEEKD | awk '{print substr($1,1,4)}'`
+  # ptrint the date information
   echo $yyyy-$mm-$ymd_day
   # observation
   while($#rec_list >= $rec_index)
