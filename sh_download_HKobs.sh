@@ -47,6 +47,7 @@ if ($#argv >= 7) then
 endif
 
 set ftppath = ftp://igs.gnsswhu.cn/pub
+# set ftppath = https://cddis.nasa.gov/archive
 set ftpAC = WHU
 if ($8 == 1) then
   set ftppath = https://cddis.nasa.gov/archive
@@ -56,7 +57,7 @@ else if ($8 == 2) then
   set ftpAC = WHU
 endif
 
-set workdir = /home/hanjunjie/data/IONOGRID/$yyyy
+set workdir = /cache/hanjunjie/Data/$yyyy
 if ($#argv >= 9) then
   set workdir = $9
 endif
@@ -72,11 +73,38 @@ set gfzrnx = /home/hanjunjie/tools/gfzrnx
 #set rec_list = (yarr yar3)
 #set rec_list = (wtza wtzz yarr yar3)
 #set rec_list = (areg areq wtzz wtza yarr yar3 irkj irkm gold gol2 wtzr wtzs)
-#set rec_list = (hkcl hkfn hkks hkkt hklm hklt hkmw hknp hkoh hkpc hksc hksl hkss hkst hktk hkws kyc1 t430)
-set rec_list = (hkqt)
+set rec_list = (hkcl hkfn hkks hkkt hklm hklt hkmw hknp hkoh hkpc hksc hksl hkss hkst hktk hkws kyc1 t430)
+# set rec_list = (hkkt hklm hklt hkmw hknp hkoh hkpc hksc hksl hkss hkst hktk hkws kyc1 t430)
+# set rec_list = (hksc)
+#set rec_list = (hksc hktk hklm)
 set ftpUPD1 = http://igmas.users.sgg.whu.edu.cn/products/download/directory/products/upd
 set ftpUPD2 = http://igmas.users.sgg.whu.edu.cn/products/download/directory/products/upd
 while($count)
+  # if ( $doy == 303 ) then
+  #       @ count --
+  #       @ doy ++
+  #       continue
+  # endif
+  # if ( $doy == 304 ) then
+  #       @ count --
+  #       @ doy ++
+  #       continue
+  # endif
+  # if ( $doy == 305 ) then
+  #       @ count --
+  #       @ doy ++
+  #       continue
+  # endif
+  # if ( $doy == 310 ) then
+  #       @ count --
+  #       @ doy ++
+  #       continue
+  # endif
+  # if ( $doy == 303 ) then
+  #       @ count --
+  #       @ doy ++
+  #       continue
+  # endif
   # date transform
   set rec_index = 1
   set cdoy   = `echo $doy | awk '{printf("%3.3d\n",$1)}'`
@@ -122,7 +150,8 @@ while($count)
             if ($crt_beg >= 23) then
                 set crt_last = 0
             endif
-            curl -c .urs_cookies -b .urs_cookies -n -L "ftp://ftp.geodetic.gov.hk/rinex3/${yyyy}/${cdoy}/${crt_rec}/5s/${CRT_REC}_R_${yyyy}${cdoy}${crt_beg}00_01H_05S_MO.crx.gz" -O
+            echo "ftp://ftp.geodetic.gov.hk/rinex3/${yyyy}/${cdoy}/${crt_rec}/5s/${CRT_REC}_R_${yyyy}${cdoy}${crt_beg}00_01H_05S_MO.crx.gz"
+            curl -c .urs_cookies -b .urs_cookies -n -L --silent "ftp://ftp.geodetic.gov.hk/rinex3/${yyyy}/${cdoy}/${crt_rec}/5s/${CRT_REC}_R_${yyyy}${cdoy}${crt_beg}00_01H_05S_MO.crx.gz" -O
             gunzip -f ${CRT_REC}_R_${yyyy}${cdoy}${crt_beg}00_01H_05S_MO.crx.gz
             mv ${CRT_REC}_R_${yyyy}${cdoy}${crt_beg}00_01H_05S_MO.crx $crt_rec${cdoy}${crt_beg}.${yy}d
             ${crx2rnx} ${crt_rec}${cdoy}${crt_beg}.${yy}d
@@ -156,9 +185,10 @@ while($count)
     endif
     
     if ($sample == 30) then
-          curl -c .urs_cookies -b .urs_cookies -n -L "ftp://ftp.geodetic.gov.hk/rinex3/${yyyy}/${cdoy}/${crt_rec}/30s/${CRT_REC}_R_${yyyy}${cdoy}0000_01D_30S_MO.crx.gz" -O
+          curl -c .urs_cookies -b .urs_cookies -n -L "https://rinex.geodetic.gov.hk/rinex3/${yyyy}/${cdoy}/${crt_rec}/30s/${CRT_REC}_R_${yyyy}${cdoy}0000_01D_30S_MO.crx.gz" -O
           gunzip -f ${CRT_REC}_R_${yyyy}${cdoy}0000_01D_30S_MO.crx.gz
-          mv ${CRT_REC}_R_${yyyy}${cdoy}0${crt_beg}00_01D_30S_MO.crx $crt_rec${cdoy}0.${yy}d
+          pwd
+          mv ${CRT_REC}_R_${yyyy}${cdoy}0${crt_beg}0_01D_30S_MO.crx $crt_rec${cdoy}0.${yy}d
           ${crx2rnx} ${crt_rec}${cdoy}0.${yy}d
           mv ${crt_rec}${cdoy}0.${yy}o ${obsdir}/${crt_rec}${cdoy}0.${yy}o
     endif
@@ -169,31 +199,33 @@ while($count)
   end
   # download sp3 and clk
   echo "Downloading sp3 from $ftpAC"
-  if (! -e igs$WEEKD.sp3.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/grm$WEEKD.sp3.Z" -O
+  # if (! -e igs$WEEKD.sp3.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/grm$WEEKD.sp3.Z" -O
   # if (! -e grm$WEEKD.sp3.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/COD0MGXFIN_${yyyy}${cdoy}0000_01D_05M_ORB.SP3.gz" -O
-  if (! -e grm$WEEKD.sp3.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_05M_ORB.SP3.gz" -O
-  if (-e grm$WEEKD.sp3.Z) then
-    gunzip -f grm$WEEKD.sp3.Z
-    mv -f grm$WEEKD.sp3 $sp3dir
-  else
-    gunzip -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_05M_ORB.SP3.gz
-    mv -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_05M_ORB.SP3 $sp3dir/gfz$WEEKD.sp3
+  # if (! -e grm$WEEKD.sp3.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_05M_ORB.SP3.gz" -O
+  # curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/$WEEK/GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_05M_ORB.SP3.gz" -O
+  # if (-e grm$WEEKD.sp3.Z) then
+  #   gunzip -f grm$WEEKD.sp3.Z
+  #   mv -f grm$WEEKD.sp3 $sp3dir
+  # else
+  #   gunzip -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_05M_ORB.SP3.gz
+  #   mv -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_05M_ORB.SP3 $sp3dir/gfz$WEEKD.sp3
   
 
   echo "Downloading clk from $ftpAC"
-  if (! -e igs$WEEKD.clk.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/grm$WEEKD.clk.Z" -O
-  if (! -e grm$WEEKD.clk.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_30S_CLK.CLK.gz" -O
-  if (-e grm$WEEKD.clk.Z) then
-    gunzip -f grm$WEEKD.clk.Z
-    mv -f grm$WEEKD.clk $clkdir
-  else
-    gunzip -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_30S_CLK.CLK.gz
-    mv -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_30S_CLK.CLK $clkdir/gfz$WEEKD.clk
+  # if (! -e igs$WEEKD.clk.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/grm$WEEKD.clk.Z" -O
+  # if (! -e grm$WEEKD.clk.Z) curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/$WEEK/GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_30S_CLK.CLK.gz" -O
+  # curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/$WEEK/GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_30S_CLK.CLK.gz" -O
+  # if (-e grm$WEEKD.clk.Z) then
+  #   gunzip -f grm$WEEKD.clk.Z
+  #   mv -f grm$WEEKD.clk $clkdir
+  # else
+  #   gunzip -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_30S_CLK.CLK.gz
+  #   mv -f GFZ0MGXRAP_${yyyy}${cdoy}0000_01D_30S_CLK.CLK $clkdir/gfz$WEEKD.clk
    
   echo "Downloading eph from $ftpAC"
   if (! -e brdc$cdoy"0."$yy"n".Z) then
 	  curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gnss/mgex/daily/rinex3/$yyyy/$cdoy/${yy}p/brdm${cdoy}0.${yy}p.Z" -O
-    if (${yyyy} == 2021) then
+    if (${yyyy} >= 2021) then
       echo "eph >= 2021"
       curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/data/daily/$yyyy/$cdoy/${yy}p/BRDM00DLR_S_${yyyy}${cdoy}0000_01D_MN.rnx.gz" -O
       mv BRDM00DLR_S_${yyyy}${cdoy}0000_01D_MN.rnx.gz brdm${cdoy}0.${yy}p.Z
@@ -203,14 +235,14 @@ while($count)
   endif
 
   echo "Downloading DCB from $ftpAC"
-  curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/dcb/$yyyy/CAS0MGXRAP_${yyyy}${cdoy}0000_01D_01D_DCB.BSX.gz" -O
-  gunzip -f "CAS0MGXRAP_${yyyy}${cdoy}0000_01D_01D_DCB.BSX.gz"
-  mv -f CAS0MGXRAP_${yyyy}${cdoy}0000_01D_01D_DCB.BSX $dcbdir/CAS$WEEKD.BIA
+  # curl -c .urs_cookies -b .urs_cookies -n -L --silent "$ftppath/gps/products/mgex/dcb/$yyyy/CAS0MGXRAP_${yyyy}${cdoy}0000_01D_01D_DCB.BSX.gz" -O
+  # gunzip -f "CAS0MGXRAP_${yyyy}${cdoy}0000_01D_01D_DCB.BSX.gz"
+  # mv -f CAS0MGXRAP_${yyyy}${cdoy}0000_01D_01D_DCB.BSX $dcbdir/CAS$WEEKD.BIA
 
   echo "Downloading UPD from GREAT"
-  cp /home/iGMAS/gnss_product/upd/${yyyy}/${cdoy}/upd_nl_${yyyy}${cdoy}_GREC $upddir/
-  cp /home/iGMAS/gnss_product/upd/${yyyy}/${cdoy}/upd_wl_${yyyy}${cdoy}_GREC $upddir/
-  cp /home/iGMAS/gnss_product/upd/${yyyy}/${cdoy}/upd_ewl_${yyyy}${cdoy}_GEC $upddir/
+  # cp /home/iGMAS/gnss_product/upd/${yyyy}/${cdoy}/upd_nl_${yyyy}${cdoy}_GREC $upddir/
+  # cp /home/iGMAS/gnss_product/upd/${yyyy}/${cdoy}/upd_wl_${yyyy}${cdoy}_GREC $upddir/
+  # cp /home/iGMAS/gnss_product/upd/${yyyy}/${cdoy}/upd_ewl_${yyyy}${cdoy}_GEC $upddir/
   
 
   

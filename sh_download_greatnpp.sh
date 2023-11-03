@@ -61,18 +61,23 @@ set gfzrnx = /home/hanjunjie/tools/gfzrnx
 #set rec_list = (wtza wtzz yarr yar3)
 #set rec_list = (areg areq wtzz wtza yarr yar3 irkj irkm gold gol2 wtzr wtzs)
 #set rec_list = (WHXZ WHDS XGXN N004 N028 N047 N068 WUDA WHXK WHYJ WHSP K042 K057 K059 K070 K101 K110 2KJ1 A010 V092 S028 H035 H038 H053 H055 H068 H074 H139)
-#set rec_list = (WUDA)
-#set rec_list = (1012 1022 1140 3026 2KJ1 A010 C004 D002 D007 D017 D018 E033 F094 H035 H038 H053 H055 H068 H074 H139 I092 J003 K042 K057 K059 K070 K101 K110 M175 M192 N004 N062 N010 N032 N028 N047 N068 O038 P053 S028 T023 T044 U029 V092 W038 X046 Y065 CQKZ CZDZ FYFN NCAY NYNZ SXXA WHDS WHSP WHXK WHXZ WHYJ XGXN XXFH YYJK)
+# set rec_list = (WUDA)
+set rec_list = (1012 1022 1140 3026 2KJ1 A010 C004 D002 D007 D017 D018 E033 F094 H035 H038 H053 H055 H068 H074 H139 I092 J003 K042 K057 K059 K070 K101 K110 M175 M192 N004 N062 N010 N032 N028 N047 N068 O038 P053 S028 T023 T044 U029 V092 W038 X046 Y065 CQKZ CZDZ FYFN NCAY NYNZ SXXA WHDS WHSP WHXK WHXZ WHYJ XGXN XXFH YYJK)
+#set rec_list = (M175 M192 N004 N062 N010 N032 N028 N047 N068 O038 P053 S028 T023 T044 U029 V092 W038 X046 Y065 CQKZ CZDZ FYFN NCAY NYNZ SXXA WHDS WHSP WHXK WHXZ WHYJ XGXN XXFH YYJK)
 # observation rinex3 first
 set workdir = /home/hanjunjie/data/IONO/$yyyy
 set obsdir = $workdir/OBS
 cd $workdir
-set rec_index = 1
-set cdoy   = `echo $doy | awk '{printf("%3.3d\n",$1)}'`
-mkdir -p $obsdir/$cdoy/GRID
-while($#rec_list >= $rec_index)
-  set crt_rec = $rec_list[$rec_index]
-  echo "Downloading $crt_rec obs from greatnpp"
-  cp  /home/greatnpp/project/sixents202107-sixents/bnc_out_65_106_backup1/obs/${crt_rec}00CHN_S_${yyyy}${cdoy}0000_01D_01S_MO.rnx $obsdir/$cdoy/GRID/$crt_rec${cdoy}0.${yy}o
-  @ rec_index ++
+while($count)
+  set cdoy   = `echo $doy | awk '{printf("%3.3d\n",$1)}'`
+  mkdir -p $obsdir/$cdoy
+  set rec_index = 1
+  while($#rec_list >= $rec_index)
+    set crt_rec = $rec_list[$rec_index]
+    echo "Downloading $crt_rec obs from greatnpp"
+    cp  /home/greatnpp/project/sixents202107-sixents/bnc_out_65_106_backup1/obs/${crt_rec}00CHN_S_${yyyy}${cdoy}0000_01D_01S_MO.rnx $obsdir/$cdoy/$crt_rec${cdoy}0.${yy}o
+    @ rec_index ++
+  end
+  @ doy ++
+  @ count --
 end
